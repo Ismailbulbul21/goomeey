@@ -67,11 +67,18 @@ All labels displayed in both Somali and English:
 
 3. **Set up environment variables**
    
-   Create a `.env.local` file in the root directory (see `ENV_VARIABLES.txt` for details):
+   Create a `.env` file in the root directory:
    ```env
-   VITE_SUPABASE_URL=https://dotjwzfbofdfjpfaniuy.supabase.co
-   VITE_SUPABASE_ANON_KEY=your_anon_key_here
+   VITE_SUPABASE_URL=https://your-project-id.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-anon-key-here
    ```
+   
+   **For local development**, you can copy the example file:
+   ```bash
+   cp env.example .env
+   ```
+   
+   Then edit `.env` with your actual Supabase credentials.
 
 4. **Start the development server**
    ```bash
