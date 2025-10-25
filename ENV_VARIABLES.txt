@@ -1,0 +1,10 @@
+CREATE A FILE NAMED: .env.local
+
+Add these environment variables:
+
+VITE_SUPABASE_URL=https://dotjwzfbofdfjpfaniuy.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvdGp3emZib2ZkZmpwZmFuaXV5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEyMjY4NDQsImV4cCI6MjA3NjgwMjg0NH0.KIQ2DbeJEnqfH6gCvRYS-1O_9OtqAMzSM824qEHjO6U
+
+Note: This file should be created at the root of the project (same level as package.json)
+
+
