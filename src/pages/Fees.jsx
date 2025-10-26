@@ -153,10 +153,8 @@ const FeeModal = ({ fee, onClose, onSuccess }) => {
     saveMutation.mutate(formData);
   };
 
-  // Fee template - Only Monthly Tuition
-  const templates = [
-    { fee_name: 'Monthly Tuition', description: 'Regular monthly tuition fee' },
-  ];
+  // No templates - allow custom fee creation
+  const templates = [];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">

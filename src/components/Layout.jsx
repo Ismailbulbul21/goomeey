@@ -3,9 +3,9 @@ import { Sidebar } from './Sidebar';
 
 export const Layout = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100">
       <Sidebar />
-      <main className="lg:ml-64 min-h-screen">
+      <main className="lg:ml-72 min-h-screen">
         <div className="p-4 lg:p-8">
           <Outlet />
         </div>
