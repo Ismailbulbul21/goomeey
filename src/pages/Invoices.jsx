@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '../lib/supabaseClient';
-import { Plus, Search, Printer, X, Loader2, AlertCircle, Calendar, Zap } from 'lucide-react';
+import { Plus, Search, Printer, X, Loader2, AlertCircle, Calendar, Zap, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'unpaid', 'paid'
   const [showQuickGenModal, setShowQuickGenModal] = useState(false);
   const [showCustomGenModal, setShowCustomGenModal] = useState(false);
   const queryClient = useQueryClient();
@@ -28,12 +29,31 @@ export const Invoices = () => {
     },
   });
 
-  // Filter invoices
-  const filteredInvoices = invoices?.filter((invoice) =>
-    invoice.students.student_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.fees.fee_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.month_name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Calculate invoice counts by status
+  const invoiceCounts = {
+    all: invoices?.length || 0,
+    unpaid: invoices?.filter(inv => inv.status === 'unpaid').length || 0,
+    paid: invoices?.filter(inv => inv.status === 'paid').length || 0,
+  };
+
+  // Filter invoices by status first, then by search term
+  const filteredInvoices = invoices?.filter((invoice) => {
+    // Filter by status
+    if (statusFilter === 'unpaid' && invoice.status !== 'unpaid') return false;
+    if (statusFilter === 'paid' && invoice.status !== 'paid') return false;
+    
+    // Filter by search term
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        invoice.students.student_name.toLowerCase().includes(searchLower) ||
+        invoice.fees.fee_name.toLowerCase().includes(searchLower) ||
+        invoice.month_name.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    return true;
+  });
 
   const handlePrint = () => {
     window.print();
@@ -72,16 +92,31 @@ export const Invoices = () => {
         </div>
       </div>
 
-      {/* Search Bar */}
-      <div className="relative no-print">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search invoices / Raadi biilal..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-        />
+      {/* Search Bar and Status Filter */}
+      <div className="flex flex-col sm:flex-row gap-4 no-print">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search invoices / Raadi biilal..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          />
+        </div>
+        
+        <div className="relative sm:w-64">
+          <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none bg-white"
+          >
+            <option value="all">All Invoices ({invoiceCounts.all})</option>
+            <option value="unpaid">Unpaid Only ({invoiceCounts.unpaid})</option>
+            <option value="paid">Paid Only ({invoiceCounts.paid})</option>
+          </select>
+        </div>
       </div>
 
       {/* Invoices Table */}

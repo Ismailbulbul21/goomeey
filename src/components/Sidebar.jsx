@@ -59,8 +59,8 @@ export const Sidebar = () => {
   const SidebarContent = () => (
     <>
       {/* Header */}
-      <div className="p-8 border-b border-gray-100">
-        <div className="flex items-center gap-3 mb-2">
+      <div className="p-5 border-b border-gray-100 shrink-0">
+        <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
             <LayoutDashboard className="w-6 h-6 text-white" />
           </div>
@@ -74,14 +74,14 @@ export const Sidebar = () => {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-6 space-y-3 overflow-y-auto">
+      <nav className="flex-1 p-4 space-y-2 overflow-hidden">
         {navigation.map((item) => (
           <NavLink
             key={item.href}
             to={item.href}
             onClick={() => setIsMobileOpen(false)}
             className={({ isActive }) =>
-              `flex items-center gap-4 px-4 py-4 rounded-2xl transition-all duration-200 group ${
+              `flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all duration-200 group ${
                 isActive
                   ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/25'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -90,10 +90,10 @@ export const Sidebar = () => {
           >
             {({ isActive }) => (
               <>
-                <item.icon className={`w-5 h-5 transition-colors ${
+                <item.icon className={`w-5 h-5 transition-colors shrink-0 ${
                   isActive ? 'text-white' : 'text-gray-400 group-hover:text-gray-600'
                 }`} />
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="text-sm font-semibold">{item.name}</div>
                   <div className={`text-xs ${
                     isActive ? 'text-blue-100' : 'text-gray-400'
@@ -106,8 +106,8 @@ export const Sidebar = () => {
       </nav>
 
       {/* User Info & Logout */}
-      <div className="p-6 border-t border-gray-100">
-        <div className="px-4 py-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl mb-4">
+      <div className="p-4 border-t border-gray-100 shrink-0">
+        <div className="px-3 py-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl mb-3">
           <p className="text-xs text-gray-500 font-medium">Logged in as</p>
           <p className="text-sm font-semibold text-gray-900 truncate mt-1">
             {user?.email}
@@ -115,9 +115,9 @@ export const Sidebar = () => {
         </div>
         <button
           onClick={signOut}
-          className="w-full flex items-center gap-4 px-4 py-4 text-red-600 hover:bg-red-50 rounded-2xl transition-all duration-200 group"
+          className="w-full flex items-center gap-3 px-3 py-2.5 text-red-600 hover:bg-red-50 rounded-2xl transition-all duration-200 group"
         >
-          <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
+          <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform shrink-0" />
           <span className="text-sm font-semibold">Logout / Kala bax</span>
         </button>
       </div>
