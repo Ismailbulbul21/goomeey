@@ -32,38 +32,70 @@ export const Invoices = () => {
 
   // Get unique months from invoices and sort them (newest first)
   const uniqueMonths = [...new Set(invoices?.map(inv => inv.month_name) || [])].sort((a, b) => {
-    // Sort by date (newest first)
-    const dateA = new Date(a);
-    const dateB = new Date(b);
-    return dateB - dateA;
+    // Parse month names like "November 2025" or "December 2025"
+    try {
+      const dateA = new Date(a);
+      const dateB = new Date(b);
+      // If dates are valid, sort by date (newest first)
+      if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+        return dateB - dateA;
+      }
+    } catch (e) {
+      // If parsing fails, sort alphabetically
+    }
+    // Fallback to alphabetical sort
+    return b.localeCompare(a);
   });
 
-  // Calculate invoice counts by status
+  // Calculate invoice counts by status, filtered by selected month
+  const invoicesForSelectedMonth = invoices?.filter((invoice) => {
+    if (monthFilter !== 'all') {
+      const invoiceMonth = invoice.month_name?.trim() || '';
+      const selectedMonth = monthFilter.trim();
+      return invoiceMonth === selectedMonth;
+    }
+    return true;
+  }) || [];
+
   const invoiceCounts = {
-    all: invoices?.length || 0,
-    unpaid: invoices?.filter(inv => inv.status === 'unpaid').length || 0,
-    paid: invoices?.filter(inv => inv.status === 'paid').length || 0,
+    all: invoicesForSelectedMonth.length,
+    unpaid: invoicesForSelectedMonth.filter(inv => inv.status === 'unpaid').length,
+    paid: invoicesForSelectedMonth.filter(inv => inv.status === 'paid').length,
   };
 
   // Filter invoices by month first, then status, then search term
   const filteredInvoices = invoices?.filter((invoice) => {
-    // Filter by month
-    if (monthFilter !== 'all' && invoice.month_name !== monthFilter) return false;
+    // Filter by month first (exact match, trimmed)
+    if (monthFilter !== 'all') {
+      const invoiceMonth = invoice.month_name?.trim() || '';
+      const selectedMonth = monthFilter.trim();
+      if (invoiceMonth !== selectedMonth) {
+        return false; // Exclude if month doesn't match exactly
+      }
+    }
     
-    // Filter by status
-    if (statusFilter === 'unpaid' && invoice.status !== 'unpaid') return false;
-    if (statusFilter === 'paid' && invoice.status !== 'paid') return false;
+    // Filter by status second
+    if (statusFilter === 'unpaid' && invoice.status !== 'unpaid') {
+      return false; // Exclude if status doesn't match
+    }
+    if (statusFilter === 'paid' && invoice.status !== 'paid') {
+      return false; // Exclude if status doesn't match
+    }
     
-    // Filter by search term
+    // Filter by search term third
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
-      return (
+      const matchesSearch = (
         invoice.students.student_name.toLowerCase().includes(searchLower) ||
         invoice.fees.fee_name.toLowerCase().includes(searchLower) ||
         invoice.month_name.toLowerCase().includes(searchLower)
       );
+      if (!matchesSearch) {
+        return false; // Exclude if search doesn't match
+      }
     }
     
+    // If all filters pass, include the invoice
     return true;
   });
 
