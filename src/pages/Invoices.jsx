@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 export const Invoices = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'unpaid', 'paid'
+  const [monthFilter, setMonthFilter] = useState('all'); // 'all' or specific month like 'March 2025'
   const [showQuickGenModal, setShowQuickGenModal] = useState(false);
   const [showCustomGenModal, setShowCustomGenModal] = useState(false);
   const queryClient = useQueryClient();
@@ -29,6 +30,14 @@ export const Invoices = () => {
     },
   });
 
+  // Get unique months from invoices and sort them (newest first)
+  const uniqueMonths = [...new Set(invoices?.map(inv => inv.month_name) || [])].sort((a, b) => {
+    // Sort by date (newest first)
+    const dateA = new Date(a);
+    const dateB = new Date(b);
+    return dateB - dateA;
+  });
+
   // Calculate invoice counts by status
   const invoiceCounts = {
     all: invoices?.length || 0,
@@ -36,8 +45,11 @@ export const Invoices = () => {
     paid: invoices?.filter(inv => inv.status === 'paid').length || 0,
   };
 
-  // Filter invoices by status first, then by search term
+  // Filter invoices by month first, then status, then search term
   const filteredInvoices = invoices?.filter((invoice) => {
+    // Filter by month
+    if (monthFilter !== 'all' && invoice.month_name !== monthFilter) return false;
+    
     // Filter by status
     if (statusFilter === 'unpaid' && invoice.status !== 'unpaid') return false;
     if (statusFilter === 'paid' && invoice.status !== 'paid') return false;
@@ -92,17 +104,32 @@ export const Invoices = () => {
         </div>
       </div>
 
-      {/* Search Bar and Status Filter */}
+      {/* Search Bar */}
+      <div className="relative no-print">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search invoices / Raadi biilal..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+        />
+      </div>
+
+      {/* Month and Status Filters */}
       <div className="flex flex-col sm:flex-row gap-4 no-print">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search invoices / Raadi biilal..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          />
+        <div className="relative sm:w-64">
+          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <select
+            value={monthFilter}
+            onChange={(e) => setMonthFilter(e.target.value)}
+            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent appearance-none bg-white"
+          >
+            <option value="all">All Months</option>
+            {uniqueMonths.map((month) => (
+              <option key={month} value={month}>{month}</option>
+            ))}
+          </select>
         </div>
         
         <div className="relative sm:w-64">
